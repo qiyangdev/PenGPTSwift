@@ -2,6 +2,14 @@
 
 An independent Swift port of [PenGPT](https://github.com/greydanus/pengpt) for iOS and macOS. It uses Accelerate to turn text into ordered handwriting or sketch strokes on-device. Render the strokes with SwiftUI or Core Graphics, or export them as SVG.
 
+## Demo
+
+Handwriting and text-to-sketch on iPhone Duo.
+
+https://github.com/user-attachments/assets/8af83e17-8e30-45f4-a8bc-5fb1b9065ce4
+
+## Capabilities
+
 | Capability | API |
 | --- | --- |
 | Handwriting with a preset writer | `HandwritingModel.write` |
