@@ -73,7 +73,7 @@ package struct ModelFile: Codable {
                 }
                 let scales = rowScales.littleEndianFloats()
                 let columns = shape[1]
-                result = values.withUnsafeBytes { bytes in
+                result = values.withUnsafeBytes { (bytes: UnsafeRawBufferPointer) in
                     Array(unsafeUninitializedCapacity: count) { out, initialized in
                         for (row, scale) in scales.enumerated() {
                             let start = row * columns
