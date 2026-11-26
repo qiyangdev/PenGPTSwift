@@ -74,7 +74,7 @@ private struct HandwritingScreen: View {
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Picker("Mode", selection: Binding(get: { mode }, set: selectMode)) {
+                    Picker("Mode", selection: $mode) {
                         Text("Write").tag(Mode.handwriting)
                         Text("Draw").tag(Mode.sketch)
                     }
@@ -114,6 +114,7 @@ private struct HandwritingScreen: View {
                 }
             }
         }
+        .onChange(of: mode) { _ in clearCanvas() }
         .task(id: runnableRequestID) { [request, canvasWidth] in
             guard let request else { return }
             if request.mode == .handwriting {
@@ -131,9 +132,7 @@ private struct HandwritingScreen: View {
         return request.id
     }
 
-    private func selectMode(_ selection: Mode) {
-        guard selection != mode else { return }
-        mode = selection
+    private func clearCanvas() {
         strokes = []
         extent = .zero
         error = nil
