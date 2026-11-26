@@ -8,20 +8,33 @@
 
 /* Begin PBXBuildFile section */
 		05DDD8F211C5FA37E1EA3960 /* Models in Resources */ = {isa = PBXBuildFile; fileRef = A3A86A440C02386F8BF40AD1 /* Models */; };
+		64119E9143C29A1CE9CE70BF /* Models in Resources */ = {isa = PBXBuildFile; fileRef = A3A86A440C02386F8BF40AD1 /* Models */; };
+		7612CE5621477C043006F03D /* InkCanvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BCC062AF642883996754520 /* InkCanvas.swift */; };
 		8AB7FD44EE883FC152D5E465 /* PenGPT in Frameworks */ = {isa = PBXBuildFile; productRef = F28F7DE49808FA84DB7087F5 /* PenGPT */; };
 		963A96CAF78E36B862890EAC /* InkCanvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BCC062AF642883996754520 /* InkCanvas.swift */; };
+		9A1A2E65102DE93053FBB78F /* HandwritingExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4189236EC37FE423B3A8CE6 /* HandwritingExampleApp.swift */; };
 		F21819A4C2268572293362DE /* HandwritingExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4189236EC37FE423B3A8CE6 /* HandwritingExampleApp.swift */; };
+		FE07EDA3F0764DE5E4FC0D9B /* PenGPT in Frameworks */ = {isa = PBXBuildFile; productRef = 2D7D02D5D5CC991CB506F243 /* PenGPT */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		2742388EB995415798E9B02F /* HandwritingExample.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = HandwritingExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		3F344B3FC77A5B7F90CC5332 /* PenGPTSwift */ = {isa = PBXFileReference; lastKnownFileType = folder; name = PenGPTSwift; path = ../..; sourceTree = SOURCE_ROOT; };
+		5363672921C6E664FB1E0103 /* PenGPTSwift */ = {isa = PBXFileReference; lastKnownFileType = folder; name = PenGPTSwift; path = ../..; sourceTree = SOURCE_ROOT; };
 		7BCC062AF642883996754520 /* InkCanvas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InkCanvas.swift; sourceTree = "<group>"; };
+		8D4D2801955686885228B6E8 /* HandwritingExampleMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HandwritingExampleMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A3A86A440C02386F8BF40AD1 /* Models */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Models; sourceTree = SOURCE_ROOT; };
 		D4189236EC37FE423B3A8CE6 /* HandwritingExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandwritingExampleApp.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		57577ACDF325006CD6913C59 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FE07EDA3F0764DE5E4FC0D9B /* PenGPT in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		CAA5B8C6791296DD09E1BEBD /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -37,6 +50,7 @@
 			isa = PBXGroup;
 			children = (
 				2742388EB995415798E9B02F /* HandwritingExample.app */,
+				8D4D2801955686885228B6E8 /* HandwritingExampleMac.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -44,7 +58,7 @@
 		984D8731F7689171510BD126 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
-				3F344B3FC77A5B7F90CC5332 /* PenGPTSwift */,
+				5363672921C6E664FB1E0103 /* PenGPTSwift */,
 			);
 			name = Packages;
 			sourceTree = "<group>";
@@ -83,6 +97,26 @@
 			productReference = 2742388EB995415798E9B02F /* HandwritingExample.app */;
 			productType = "com.apple.product-type.application";
 		};
+		FA0B0462F1625A868DF432F2 /* HandwritingExampleMac */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A63FEE75C842C8A7AA572A23 /* Build configuration list for PBXNativeTarget "HandwritingExampleMac" */;
+			buildPhases = (
+				957BFFD151B57F992457AB3E /* Sources */,
+				CBF7EF0A42603F2634EEFD5B /* Resources */,
+				57577ACDF325006CD6913C59 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = HandwritingExampleMac;
+			packageProductDependencies = (
+				2D7D02D5D5CC991CB506F243 /* PenGPT */,
+			);
+			productName = HandwritingExampleMac;
+			productReference = 8D4D2801955686885228B6E8 /* HandwritingExampleMac.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -112,6 +146,7 @@
 			projectRoot = "";
 			targets = (
 				3C5ECB5FF0E291102B78247D /* HandwritingExample */,
+				FA0B0462F1625A868DF432F2 /* HandwritingExampleMac */,
 			);
 		};
 /* End PBXProject section */
@@ -125,9 +160,26 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CBF7EF0A42603F2634EEFD5B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				64119E9143C29A1CE9CE70BF /* Models in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		957BFFD151B57F992457AB3E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9A1A2E65102DE93053FBB78F /* HandwritingExampleApp.swift in Sources */,
+				7612CE5621477C043006F03D /* InkCanvas.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BA94D4C75C3E988DA50823B9 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -188,10 +240,27 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		2F356ABBCEFF3D7525496A3A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = PenGPT;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.pengpt.HandwritingExampleMac;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 6.0;
 			};
 			name = Release;
 		};
@@ -271,10 +340,27 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		CEE9323803151D7FC8EC838F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = PenGPT;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.pengpt.HandwritingExampleMac;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
 		};
@@ -311,6 +397,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
+		A63FEE75C842C8A7AA572A23 /* Build configuration list for PBXNativeTarget "HandwritingExampleMac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CEE9323803151D7FC8EC838F /* Debug */,
+				2F356ABBCEFF3D7525496A3A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		CE5E40655CDF4A40C64398FA /* Build configuration list for PBXProject "HandwritingExample" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -330,6 +425,10 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		2D7D02D5D5CC991CB506F243 /* PenGPT */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PenGPT;
+		};
 		F28F7DE49808FA84DB7087F5 /* PenGPT */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PenGPT;

@@ -76,7 +76,13 @@ If you already fitted a handwriting style with the [upstream photo workflow](htt
 
 Copy `hand.pengpt` into `Examples/Handwriting/Models/`. Add `sketch.pengpt` and `words.pengpt` to enable Draw mode. Open [HandwritingExample.xcodeproj](Examples/Handwriting/HandwritingExample.xcodeproj) and run the **HandwritingExample** scheme on an iOS simulator.
 
-The example shows incremental handwriting and sketch rendering, pause and resume, and SVG sharing. The Write and Draw modes share a full-width transparent canvas.
+Use **Choose Writer** in the Write toolbar to search the model’s writer IDs and regenerate with the selected style. In Draw mode, open **Drawing Settings** in the toolbar to choose the source for the next drawing and adjust guidance and ink. The example also supports pause and resume and SVG sharing. Both modes share a full-width transparent canvas and a text field in the bottom toolbar.
+
+## Run the macOS example
+
+Use the same model files as the iOS example. In Xcode, select the **HandwritingExampleMac** scheme and run it on **My Mac**. The macOS example requires macOS 14 or later.
+
+Use the inspector to switch between Write and Draw, enter text, and control playback. In Write mode, the Writer menu shows the selected style and lets you choose a different one. In Draw mode, the inspector shows the source, guidance, and ink settings. Use the window toolbar to share the result or toggle the inspector.
 
 ## Tests
 
