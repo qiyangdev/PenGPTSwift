@@ -1,0 +1,42 @@
+name: CI
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  swift:
+    runs-on: macos-15
+    timeout-minutes: 20
+    env:
+      PENGPT_MODELS: https://github.com/greydanus/pengpt/releases/download/models-2026-11-16
+      FIXTURES: Tests/PenGPTTests/Fixtures
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Fetch pinned upstream models
+        run: |
+          curl --fail --location --retry 3 --output hand.npz "$PENGPT_MODELS/hand.npz"
+          curl --fail --location --retry 3 --output pengpt.npz "$PENGPT_MODELS/pengpt.npz"
+          shasum -a 256 -c - <<'CHECKSUMS'
+          4470544dc428d1da41a7c5c6096652556b1dc6afc4c87d1ccd1ee62716153514  hand.npz
+          d678fc79c86344f17cfa1419e3ec76ee151dfd7f153026188ec445d101bfd288  pengpt.npz
+          CHECKSUMS
+
+      - name: Convert models
+        run: |
+          swift run -c release pengpt-convert hand.npz "$FIXTURES/released-hand.pengpt"
+          swift run -c release pengpt-convert --component sketch pengpt.npz "$FIXTURES/released-sketch.pengpt"
+          swift run -c release pengpt-convert --component words pengpt.npz "$FIXTURES/released-words.pengpt"
+
+      - name: Run Swift tests
+        run: swift test -c release
+
+      - name: Build the iOS example
+        run: |
+          xcodebuild -project Examples/Handwriting/HandwritingExample.xcodeproj \
+            -scheme HandwritingExample -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath "$RUNNER_TEMP/pengpt-example" CODE_SIGNING_ALLOWED=NO -quiet build

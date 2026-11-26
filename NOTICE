@@ -1,0 +1,13 @@
+PenGPTSwift is an independent Swift port of PenGPT by Sam Greydanus and
+the PenGPT contributors.
+
+Upstream project: https://github.com/greydanus/pengpt
+Source revision: 3637f5c29989cd511bc3af90e3af1d2cbcdcb3e5
+
+The Swift runtime, model reader, and tests adapt code and fixtures from
+the upstream Apache License 2.0 project. See LICENSE.
+
+The optional sketch text encoder uses weights derived from TinyCLIP
+(wkcn/TinyCLIP-ViT-39M-16-Text-19M-YFCC15M), identified as MIT by its
+publisher. Model weights are downloaded from the upstream PenGPT release.
+https://huggingface.co/wkcn/TinyCLIP-ViT-39M-16-Text-19M-YFCC15M

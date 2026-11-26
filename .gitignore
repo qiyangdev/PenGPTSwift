@@ -1,0 +1,9 @@
+.DS_Store
+.build/
+.swiftpm/
+**/xcuserdata/
+DerivedData/
+*.pengpt
+*.npy
+*.npz
+!Tests/PenGPTTests/Fixtures/tiny.model.npz
