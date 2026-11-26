@@ -9,8 +9,10 @@ public struct SketchOptions: Sendable {
     public var strokeCount: Int?
     public var maxTokens: Int?
 
-    public init(temperature: Double = 0.6, topK: Int? = nil, seed: UInt32 = 0, guidance: Float? = nil,
-                ink: Double? = nil, strokeCount: Int? = nil, maxTokens: Int? = nil) {
+    public init(
+        temperature: Double = 0.6, topK: Int? = nil, seed: UInt32 = 0, guidance: Float? = nil,
+        ink: Double? = nil, strokeCount: Int? = nil, maxTokens: Int? = nil
+    ) {
         self.temperature = temperature
         self.topK = topK
         self.seed = seed
@@ -58,8 +60,10 @@ public actor SketchSession {
     private var random: SamplingRandom
     private var tokens: [Int] = []
 
-    fileprivate init(decoder: Decoder, vector: [Float]?, source: Int, options: HandwritingOptions,
-                     controls: SketchControls, live: Bool) {
+    fileprivate init(
+        decoder: Decoder, vector: [Float]?, source: Int, options: HandwritingOptions,
+        controls: SketchControls, live: Bool
+    ) {
         self.decoder = decoder
         self.vector = vector
         self.source = source
@@ -79,10 +83,12 @@ public actor SketchSession {
         self.controls = controls
 
         for _ in 0 ..< every {
-            guard let token = try decoder.nextToken(
-                &generation, text: "", writer: source, options: options, rng: &random,
-                guidance: guidance, vector: vector, ink: controls.ink, strokeCount: controls.strokeCount
-            ) else { break }
+            guard
+                let token = try decoder.nextToken(
+                    &generation, text: "", writer: source, options: options, rng: &random,
+                    guidance: guidance, vector: vector, ink: controls.ink, strokeCount: controls.strokeCount
+                )
+            else { break }
             if token < decoder.stroke.pad { tokens.append(token) }
         }
         let paths = decoder.stroke.decode(tokens)
@@ -129,28 +135,36 @@ public struct SketchModel: Sendable {
     }
 
     /// Generates one drawing with coordinates in model units.
-    public func draw(_ prompt: String, source: String = "", options: SketchOptions = .init()) async throws -> InkDrawing {
+    public func draw(_ prompt: String, source: String = "", options: SketchOptions = .init()) async throws -> InkDrawing
+    {
         let session = try makeSession(prompt, source: source, options: options, live: false)
         return try await session.nextFrame(every: Int.max)?.drawing ?? InkDrawing(strokes: [])
     }
 
     /// Creates a session that can stream progressive snapshots and accept live controls.
-    public func startSketch(_ prompt: String, source: String = "", options: SketchOptions = .init()) async throws -> SketchSession {
+    public func startSketch(_ prompt: String, source: String = "", options: SketchOptions = .init()) async throws
+        -> SketchSession
+    {
         try makeSession(prompt, source: source, options: options, live: true)
     }
 
-    private func makeSession(_ prompt: String, source: String, options: SketchOptions, live: Bool) throws -> SketchSession {
+    private func makeSession(_ prompt: String, source: String, options: SketchOptions, live: Bool) throws
+        -> SketchSession
+    {
         let controls = SketchControls(guidance: options.guidance, ink: options.ink, strokeCount: options.strokeCount)
         let guidance = try controls.validated(for: decoder)
         guard options.temperature.isFinite, options.temperature >= 0,
-              (options.topK ?? 1) > 0, (options.maxTokens ?? 1) > 0 else {
+            (options.topK ?? 1) > 0, (options.maxTokens ?? 1) > 0
+        else {
             throw PenGPTError.invalidOptions
         }
         guard let source = sourceIDs.firstIndex(of: source) else { throw PenGPTError.unknownWriter(source) }
         let vector = prompt.isEmpty ? nil : try encoder.encode(prompt)
-        let sampling = HandwritingOptions(temperature: options.temperature, topK: options.topK,
-                                          seed: options.seed, maxTokensPerChunk: options.maxTokens)
-        return SketchSession(decoder: decoder, vector: vector, source: source, options: sampling,
-                             controls: controls, live: guidance != 1 || (live && decoder.labelDrop))
+        let sampling = HandwritingOptions(
+            temperature: options.temperature, topK: options.topK,
+            seed: options.seed, maxTokensPerChunk: options.maxTokens)
+        return SketchSession(
+            decoder: decoder, vector: vector, source: source, options: sampling,
+            controls: controls, live: guidance != 1 || (live && decoder.labelDrop))
     }
 }

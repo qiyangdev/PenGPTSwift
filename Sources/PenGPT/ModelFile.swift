@@ -68,7 +68,8 @@ package struct ModelFile: Codable {
             let result: [Float]
             if let rowScales {
                 guard shape.count == 2, values.count == count,
-                      rowScales.count.isMultiple(of: 4), rowScales.count / 4 == shape[0] else {
+                    rowScales.count.isMultiple(of: 4), rowScales.count / 4 == shape[0]
+                else {
                     throw PenGPTError.invalidModel(name)
                 }
                 let scales = rowScales.littleEndianFloats()
@@ -108,11 +109,12 @@ package struct ModelFile: Codable {
         guard version == 1 else { throw PenGPTError.unsupportedModel }
         let config = try JSONDecoder().decode(ModelConfiguration.self, from: metadata)
         guard (1 ... 64).contains(config.nLayer), (1 ... 128).contains(config.nHead),
-              (0 ... 32).contains(config.bands), (2 ... 8192).contains(config.blockSize),
-              (2 ... 8192).contains(config.maxSeqLength), (1 ... 8192).contains(config.maxTextLength),
-              ((config.hint ?? 0) == 0 || config.maxTextLength >= 4),
-              config.grid.isFinite, config.grid > 0, config.grid <= 1,
-              !writers.isEmpty else {
+            (0 ... 32).contains(config.bands), (2 ... 8192).contains(config.blockSize),
+            (2 ... 8192).contains(config.maxSeqLength), (1 ... 8192).contains(config.maxTextLength),
+            ((config.hint ?? 0) == 0 || config.maxTextLength >= 4),
+            config.grid.isFinite, config.grid > 0, config.grid <= 1,
+            !writers.isEmpty
+        else {
             throw PenGPTError.invalidModel("model configuration")
         }
         return config
@@ -120,8 +122,9 @@ package struct ModelFile: Codable {
 
     func matrix(_ name: String, rows: Int? = nil, columns: Int? = nil) throws -> Matrix {
         guard let tensor = tensors[name], tensor.shape.count == 2,
-              tensor.shape.allSatisfy({ $0 > 0 && $0 <= Int(Int32.max) }),
-              rows == nil || rows == tensor.shape[0], columns == nil || columns == tensor.shape[1] else {
+            tensor.shape.allSatisfy({ $0 > 0 && $0 <= Int(Int32.max) }),
+            rows == nil || rows == tensor.shape[0], columns == nil || columns == tensor.shape[1]
+        else {
             throw PenGPTError.invalidModel(name)
         }
         return Matrix(rows: tensor.shape[0], columns: tensor.shape[1], values: try tensor.floats(named: name))

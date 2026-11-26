@@ -16,8 +16,9 @@ struct Matrix: Sendable {
 
     func multiply(_ input: [Float]) -> [Float] {
         var output = [Float](repeating: 0, count: rows)
-        cblas_sgemv(CblasRowMajor, CblasNoTrans, Int32(rows), Int32(columns), 1,
-                    values, Int32(columns), input, 1, 0, &output, 1)
+        cblas_sgemv(
+            CblasRowMajor, CblasNoTrans, Int32(rows), Int32(columns), 1,
+            values, Int32(columns), input, 1, 0, &output, 1)
         return output
     }
 }
@@ -96,12 +97,16 @@ struct Decoder: Sendable {
         contextTokens = try file.matrix("ctx_emb.weight", columns: width)
         contextPositions = try file.matrix("ctx_pos_emb.weight", columns: width)
         guard contextTokens.rows >= (config.textEnd ? 258 : 257),
-              contextPositions.rows >= config.maxTextLength + (config.textEnd ? 1 : 0) else {
+            contextPositions.rows >= config.maxTextLength + (config.textEnd ? 1 : 0)
+        else {
             throw PenGPTError.invalidModel("text context dimensions")
         }
-        penProjection = config.bands == 0 ? nil : try file.matrix(
-            "pen_pos_proj.weight", rows: width, columns: 4 * config.bands
-        )
+        penProjection =
+            config.bands == 0
+            ? nil
+            : try file.matrix(
+                "pen_pos_proj.weight", rows: width, columns: 4 * config.bands
+            )
         let vectorSize = config.vector ?? 0
         self.vectorSize = vectorSize
         if vectorSize > 0 {
@@ -133,7 +138,9 @@ struct Decoder: Sendable {
             let seq = headWidth / 4
             let pen = (headWidth / 2 - seq) / 2
             let seqValues = (0 ..< seq).map { Float(pow(10_000, -Double($0) / Double(seq))) }
-            let penValues = (0 ..< pen).map { Float(2 * Double.pi / (4 * pow(128, Double($0) / Double(max(pen - 1, 1))))) }
+            let penValues = (0 ..< pen).map {
+                Float(2 * Double.pi / (4 * pow(128, Double($0) / Double(max(pen - 1, 1)))))
+            }
             rotaryFrequencies = seqValues + penValues + penValues
         } else {
             rotaryFrequencies = (0 ..< headWidth / 2).map { Float(pow(10_000, -2 * Double($0) / Double(headWidth))) }
@@ -165,15 +172,19 @@ struct Decoder: Sendable {
         return Generation(sequence: sequence, given: given, capacity: capacity, caches: caches)
     }
 
-    func generate(_ text: String, writer: Int, prefix: [Int], options: HandwritingOptions,
-                  rng: inout SamplingRandom, guidance: Float = 1,
-                  vector: [Float]? = nil, ink: Double? = nil, strokeCount: Int? = nil,
-                  style: [Float]? = nil) throws -> [Int] {
+    func generate(
+        _ text: String, writer: Int, prefix: [Int], options: HandwritingOptions,
+        rng: inout SamplingRandom, guidance: Float = 1,
+        vector: [Float]? = nil, ink: Double? = nil, strokeCount: Int? = nil,
+        style: [Float]? = nil
+    ) throws -> [Int] {
         var state = makeGeneration(prefix: prefix, maxTokens: options.maxTokensPerChunk, guided: guidance != 1)
         var output: [Int] = []
-        while let token = try nextToken(&state, text: text, writer: writer, options: options, rng: &rng,
-                                        guidance: guidance, vector: vector, ink: ink, strokeCount: strokeCount,
-                                        style: style) {
+        while let token = try nextToken(
+            &state, text: text, writer: writer, options: options, rng: &rng,
+            guidance: guidance, vector: vector, ink: ink, strokeCount: strokeCount,
+            style: style)
+        {
             output.append(token)
         }
         return output
@@ -183,9 +194,11 @@ struct Decoder: Sendable {
         state.position >= state.capacity - 1 || state.sequence.last == stroke.end
     }
 
-    func nextToken(_ state: inout Generation, text: String, writer: Int, options: HandwritingOptions,
-                   rng: inout SamplingRandom, guidance: Float, vector: [Float]? = nil,
-                   ink: Double? = nil, strokeCount: Int? = nil, style: [Float]? = nil) throws -> Int? {
+    func nextToken(
+        _ state: inout Generation, text: String, writer: Int, options: HandwritingOptions,
+        rng: inout SamplingRandom, guidance: Float, vector: [Float]? = nil,
+        ink: Double? = nil, strokeCount: Int? = nil, style: [Float]? = nil
+    ) throws -> Int? {
         guard !isFinished(state) else { return nil }
         let width = tokens.columns
         let hints = hintDigits(ink: ink, strokeCount: strokeCount)
@@ -261,8 +274,10 @@ struct Decoder: Sendable {
 
     private func hintDigits(ink: Double?, strokeCount: Int?) -> [(Int, Int)] {
         guard hasHints else { return [] }
-        let requested = [ink.map { Int(min(99, max(0, (2 * $0).rounded(.toNearestOrEven)))) },
-                         strokeCount.map { min(99, max(0, $0)) }]
+        let requested = [
+            ink.map { Int(min(99, max(0, (2 * $0).rounded(.toNearestOrEven)))) },
+            strokeCount.map { min(99, max(0, $0)) },
+        ]
         return requested.enumerated().flatMap { index, value -> [(Int, Int)] in
             guard let value else { return [] }
             return [(2 * index, value / 10), (2 * index + 1, value % 10)]
@@ -344,11 +359,13 @@ struct Decoder: Sendable {
                 query.withUnsafeBufferPointer { q in
                     output.withUnsafeMutableBufferPointer { out in
                         for start in stride(from: 0, to: width, by: headWidth) {
-                            cblas_sgemv(CblasRowMajor, CblasNoTrans, rowCount, dimension, scale,
-                                        keys.baseAddress! + start, rowStride, q.baseAddress! + start, 1, 0, &scores, 1)
+                            cblas_sgemv(
+                                CblasRowMajor, CblasNoTrans, rowCount, dimension, scale,
+                                keys.baseAddress! + start, rowStride, q.baseAddress! + start, 1, 0, &scores, 1)
                             let total = exponentialWeights(&scores)
-                            cblas_sgemv(CblasRowMajor, CblasTrans, rowCount, dimension, 1 / total,
-                                        values.baseAddress! + start, rowStride, scores, 1, 0, out.baseAddress! + start, 1)
+                            cblas_sgemv(
+                                CblasRowMajor, CblasTrans, rowCount, dimension, 1 / total,
+                                values.baseAddress! + start, rowStride, scores, 1, 0, out.baseAddress! + start, 1)
                         }
                     }
                 }

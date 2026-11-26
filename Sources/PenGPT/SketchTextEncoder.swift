@@ -29,8 +29,9 @@ struct SketchTextEncoder: Sendable {
         init(file: ModelFile, rows: Int, columns: Int) throws {
             let name = "embeddings.token_embedding.weight"
             guard let tensor = file.tensors[name], tensor.shape == [rows, columns],
-                  let scaleData = tensor.rowScales, tensor.values.count == (try elementCount(tensor.shape)),
-                  scaleData.count.isMultiple(of: 4), scaleData.count / 4 == rows else {
+                let scaleData = tensor.rowScales, tensor.values.count == (try elementCount(tensor.shape)),
+                scaleData.count.isMultiple(of: 4), scaleData.count / 4 == rows
+            else {
                 throw PenGPTError.invalidModel(name)
             }
             width = columns
@@ -76,10 +77,11 @@ struct SketchTextEncoder: Sendable {
 
         func apply(_ x: [Float], epsilon: Float) -> [Float] {
             let mean = x.reduce(0) { $0 + Double($1) } / Double(x.count)
-            let variance = x.reduce(0) { sum, value in
-                let delta = Double(value) - mean
-                return sum + delta * delta
-            } / Double(x.count)
+            let variance =
+                x.reduce(0) { sum, value in
+                    let delta = Double(value) - mean
+                    return sum + delta * delta
+                } / Double(x.count)
             let scale = 1 / sqrt(variance + Double(epsilon))
             return x.indices.map { Float((Double(x[$0]) - mean) * scale * Double(weight[$0]) + Double(bias[$0])) }
         }
@@ -133,16 +135,18 @@ struct SketchTextEncoder: Sendable {
         let config = try JSONDecoder().decode(Configuration.self, from: file.metadata)
         let vocabulary = try JSONDecoder().decode(Tokenizer.self, from: tokenizer)
         guard (1 ... 64).contains(config.nLayer), (1 ... 128).contains(config.nHead),
-              (1 ... 4096).contains(config.width), config.width.isMultiple(of: config.nHead),
-              (2 ... 1024).contains(config.positions), config.eps.isFinite, config.eps > 0,
-              vocabulary.vocab.indices.contains(config.bos), vocabulary.vocab.indices.contains(config.eos) else {
+            (1 ... 4096).contains(config.width), config.width.isMultiple(of: config.nHead),
+            (2 ... 1024).contains(config.positions), config.eps.isFinite, config.eps > 0,
+            vocabulary.vocab.indices.contains(config.bos), vocabulary.vocab.indices.contains(config.eos)
+        else {
             throw PenGPTError.invalidModel("sketch text encoder configuration")
         }
         self.config = config
         ids = Dictionary(vocabulary.vocab.enumerated().map { ($1, $0) }, uniquingKeysWith: { first, _ in first })
         ranks = Dictionary(vocabulary.merges.enumerated().map { ($1, $0) }, uniquingKeysWith: { first, _ in first })
         tokens = try EmbeddingTable(file: file, rows: vocabulary.vocab.count, columns: config.width)
-        positions = try file.matrix("embeddings.position_embedding.weight", rows: config.positions, columns: config.width)
+        positions = try file.matrix(
+            "embeddings.position_embedding.weight", rows: config.positions, columns: config.width)
         layers = try (0 ..< config.nLayer).map { try Layer(file: file, index: $0, width: config.width) }
         finalNorm = try Norm(file, "final_layer_norm", config.width)
         projection = try Linear(file, "head", rows: config.vector, columns: config.width)

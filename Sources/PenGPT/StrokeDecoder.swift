@@ -29,7 +29,8 @@ struct StrokeDecoder: Sendable {
             let a = merges[offset]
             let b = merges[offset + 1]
             guard paths.indices.contains(a), paths.indices.contains(b), merges[offset + 2] == paths.count,
-                  paths[a].count + paths[b].count <= 4096 else {
+                paths[a].count + paths[b].count <= 4096
+            else {
                 throw PenGPTError.invalidModel("stroke merge at \(offset / 3)")
             }
             let shift = deltas[a]
@@ -88,7 +89,8 @@ private func smooth(_ original: [Coordinate], grid: Double) -> [Coordinate] {
     }
     let last = corners.count - 1
     cuts.append(last)
-    let closed = corners.count > 4 && cuts.count == 2 && length(corners[last] - corners[0]) < grid
+    let closed =
+        corners.count > 4 && cuts.count == 2 && length(corners[last] - corners[0]) < grid
         && !isSharp(corners[0] - corners[last - 1], corners[1] - corners[0])
     let pieces: [[Coordinate]]
     if closed {

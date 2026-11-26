@@ -25,8 +25,9 @@ final class HandwritingTests: XCTestCase {
         var random = SamplingRandom(state: 0)
         for reference in cases {
             let writer = try XCTUnwrap(model.writerIDs.firstIndex(of: reference.writer))
-            let tokens = try model.decoder.generate(reference.text, writer: writer, prefix: [],
-                                                    options: .init(), rng: &random, guidance: reference.guidance)
+            let tokens = try model.decoder.generate(
+                reference.text, writer: writer, prefix: [],
+                options: .init(), rng: &random, guidance: reference.guidance)
             XCTAssertEqual(tokens, reference.tokens, reference.text)
         }
 
@@ -51,26 +52,33 @@ final class HandwritingTests: XCTestCase {
     }
 
     func testPublishedHandwritingModel() async throws {
-        guard let url = Bundle.module.url(forResource: "released-hand", withExtension: "pengpt", subdirectory: "Fixtures") else {
-            throw XCTSkip("Convert the release weights to Tests/PenGPTTests/Fixtures/released-hand.pengpt to run this test.")
+        guard
+            let url = Bundle.module.url(forResource: "released-hand", withExtension: "pengpt", subdirectory: "Fixtures")
+        else {
+            throw XCTSkip(
+                "Convert the release weights to Tests/PenGPTTests/Fixtures/released-hand.pengpt to run this test.")
         }
         let model = try await HandwritingModel.load(weightsAt: url)
         XCTAssertEqual(model.writerIDs.count, 1193)
         let writer = try XCTUnwrap(model.writerIDs.firstIndex(of: "sam"))
         var random = SamplingRandom(state: 0)
         let raw = try model.decoder.generate("Hello world", writer: writer, prefix: [], options: .init(), rng: &random)
-        XCTAssertEqual(raw, [
-            204, 8, 12, 56, 46, 9, 452, 19, 8, 323, 24, 39, 130, 32, 21, 97, 9, 302, 8, 6, 108, 30, 17,
-            15, 89, 30, 68, 140, 5, 510, 23, 26, 93, 68, 140, 17, 56, 238, 27, 78, 0, 17, 15, 44, 18, 4,
-            389, 9, 524, 524, 2, 8, 6, 93, 50, 15, 85, 11, 127, 12, 18, 21, 73, 44, 18, 4, 21, 11, 167,
-            28, 23, 26, 209, 68, 140, 17, 56, 238, 27, 78, 12, 83, 238, 371, 95, 56, 41, 50, 9, 523,
-        ])
+        XCTAssertEqual(
+            raw,
+            [
+                204, 8, 12, 56, 46, 9, 452, 19, 8, 323, 24, 39, 130, 32, 21, 97, 9, 302, 8, 6, 108, 30, 17,
+                15, 89, 30, 68, 140, 5, 510, 23, 26, 93, 68, 140, 17, 56, 238, 27, 78, 0, 17, 15, 44, 18, 4,
+                389, 9, 524, 524, 2, 8, 6, 93, 50, 15, 85, 11, 127, 12, 18, 21, 73, 44, 18, 4, 21, 11, 167,
+                28, 23, 26, 209, 68, 140, 17, 56, 238, 27, 78, 12, 83, 238, 371, 95, 56, 41, 50, 9, 523,
+            ])
 
         let text = "The quick brown fox"
         let options = HandwritingOptions(lineWidth: 1)
         let ink = try await model.write(text, writer: "sam", options: options)
         XCTAssertEqual(ink.strokes.map { $0.points.count }, [12, 17, 57, 96, 1, 82, 122, 99, 18])
-        let starts = [0, 3, 6, 7].compactMap { index in ink.strokes.indices.contains(index) ? ink.strokes[index].points.first : nil }
+        let starts = [0, 3, 6, 7].compactMap { index in
+            ink.strokes.indices.contains(index) ? ink.strokes[index].points.first : nil
+        }
         XCTAssertEqual(starts.count, 4)
         for (actual, expected) in zip(starts, [-0.18, 0.55, 1.12, 1.65]) {
             XCTAssertEqual(actual.x, 0, accuracy: 1e-6)

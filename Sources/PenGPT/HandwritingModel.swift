@@ -78,12 +78,16 @@ public struct HandwritingModel: Sendable {
     }
 
     /// Generates laid-out ink. The first line's baseline is y = 0.
-    public func write(_ text: String, writer: String = "", options: HandwritingOptions = .init()) async throws -> InkDrawing {
+    public func write(_ text: String, writer: String = "", options: HandwritingOptions = .init()) async throws
+        -> InkDrawing
+    {
         try await collect(writeWords(text, writer: writer, options: options))
     }
 
     /// Generates laid-out ink using a learned writer embedding.
-    public func write(_ text: String, style: HandwritingStyle, options: HandwritingOptions? = nil) async throws -> InkDrawing {
+    public func write(_ text: String, style: HandwritingStyle, options: HandwritingOptions? = nil) async throws
+        -> InkDrawing
+    {
         try await collect(writeWords(text, style: style, options: options))
     }
 
@@ -99,26 +103,33 @@ public struct HandwritingModel: Sendable {
     ///
     /// Each element uses the same drawing coordinates as `write`. An element can be empty if
     /// generation fails to produce ink for its word. Each iterator starts a new generation.
-    public func writeWords(_ text: String, writer: String = "", options: HandwritingOptions = .init()) throws -> HandwritingWords {
+    public func writeWords(_ text: String, writer: String = "", options: HandwritingOptions = .init()) throws
+        -> HandwritingWords
+    {
         guard let id = writerIDs.firstIndex(of: writer) else { throw PenGPTError.unknownWriter(writer) }
         return try words(text, style: decoder.writers.row(id), options: options)
     }
 
     /// Uses the fitted temperature and top-k 5 when sampling options are omitted, like the upstream photo command.
-    public func writeWords(_ text: String, style: HandwritingStyle, options: HandwritingOptions? = nil) throws -> HandwritingWords {
+    public func writeWords(_ text: String, style: HandwritingStyle, options: HandwritingOptions? = nil) throws
+        -> HandwritingWords
+    {
         guard style.embedding.count == decoder.writers.columns, style.embedding.allSatisfy(\.isFinite),
-              style.temperature.isFinite, style.temperature >= 0 else {
+            style.temperature.isFinite, style.temperature >= 0
+        else {
             throw PenGPTError.invalidOptions
         }
-        return try words(text, style: style.embedding, options: options ?? .init(temperature: style.temperature, topK: 5))
+        return try words(
+            text, style: style.embedding, options: options ?? .init(temperature: style.temperature, topK: 5))
     }
 
     private func words(_ text: String, style: [Float], options: HandwritingOptions) throws -> HandwritingWords {
         guard options.temperature.isFinite, options.temperature >= 0,
-              (options.topK ?? 1) > 0, (options.maxTokensPerChunk ?? 1) > 0,
-              options.lineWidth.isFinite, options.lineWidth > 0,
-              options.lineHeight.isFinite, options.lineHeight > 0,
-              options.wordSpacing.isFinite, options.wordSpacing >= 0 else {
+            (options.topK ?? 1) > 0, (options.maxTokensPerChunk ?? 1) > 0,
+            options.lineWidth.isFinite, options.lineWidth > 0,
+            options.lineHeight.isFinite, options.lineHeight > 0,
+            options.wordSpacing.isFinite, options.wordSpacing >= 0
+        else {
             throw PenGPTError.invalidOptions
         }
         return HandwritingWords(
@@ -179,7 +190,8 @@ public struct HandwritingWords: AsyncSequence, Sendable {
             let chunk = remaining.prefix(2)
             let input = chunk.joined(separator: " ")
             let continued = previous.map { $0 + " " + input } ?? input
-            let reusePrefix = continued.utf8.count <= decoder.maxTextLength
+            let reusePrefix =
+                continued.utf8.count <= decoder.maxTextLength
                 && prefix.count + 3 < decoder.maxSequence
             var generated = try tokenWords(reusePrefix ? continued : input, prefix: reusePrefix ? prefix : [])
             for word in chunk.dropFirst(generated.count) {
@@ -198,8 +210,9 @@ public struct HandwritingWords: AsyncSequence, Sendable {
         }
 
         private mutating func tokenWords(_ text: String, prefix: [Int]) throws -> [[Int]] {
-            let raw = try decoder.generate(text, writer: 0, prefix: prefix, options: options, rng: &rng,
-                                           guidance: decoder.labelDrop ? 2 : 1, style: style)
+            let raw = try decoder.generate(
+                text, writer: 0, prefix: prefix, options: options, rng: &rng,
+                guidance: decoder.labelDrop ? 2 : 1, style: style)
             let complete = raw.last == decoder.stroke.end
             let body = complete ? raw.dropLast() : raw[...]
             let words = body.split(separator: decoder.stroke.word).map(Array.init)

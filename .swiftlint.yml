@@ -1,0 +1,23 @@
+included:
+  - Package.swift
+  - Sources
+  - Tests
+  - Examples/Handwriting
+
+only_rules:
+  - discouraged_direct_init
+  - duplicate_conditions
+  - duplicate_enum_cases
+  - duplicate_imports
+  - empty_count
+  - empty_xctest_method
+  - fatal_error_message
+  - identical_operands
+  - orphaned_doc_comment
+  - unused_closure_parameter
+  - unused_control_flow_label
+  - unused_enumerated
+  - unused_optional_binding
+  - unused_setter_value
+  - void_function_in_ternary
+  - xctfail_message

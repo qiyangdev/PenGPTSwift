@@ -3,11 +3,14 @@ import Foundation
 extension InkDrawing {
     /// Encodes ordered pen strokes as SVG paths. Scale and padding are expressed in SVG units
     /// per model unit and in model units respectively. Colors use six-digit hexadecimal RGB.
-    public func svg(scale: Double = 160, padding: Double = 0.3, strokeWidth: Double = 2.2,
-                    ink: String = "#1a237e", background: String? = "#ffffff") throws -> String {
+    public func svg(
+        scale: Double = 160, padding: Double = 0.3, strokeWidth: Double = 2.2,
+        ink: String = "#1a237e", background: String? = "#ffffff"
+    ) throws -> String {
         guard scale.isFinite, scale > 0, padding.isFinite, padding >= 0,
-              strokeWidth.isFinite, strokeWidth > 0, isRGB(ink),
-              background.map(isRGB) ?? true else {
+            strokeWidth.isFinite, strokeWidth > 0, isRGB(ink),
+            background.map(isRGB) ?? true
+        else {
             throw PenGPTError.invalidOptions
         }
         var minX = Double.infinity
@@ -35,11 +38,13 @@ extension InkDrawing {
             throw PenGPTError.invalidOptions
         }
         let dimensions = "\(width) \(height)"
-        var svg = #"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 \#(dimensions)" width="\#(width)" height="\#(height)">"#
+        var svg =
+            #"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 \#(dimensions)" width="\#(width)" height="\#(height)">"#
         if let background {
             svg += #"<rect width="100%" height="100%" fill="\#(background)"/>"#
         }
-        svg += #"<g fill="none" stroke="\#(ink)" stroke-width="\#(strokeWidth)" stroke-linecap="round" stroke-linejoin="round">"#
+        svg +=
+            #"<g fill="none" stroke="\#(ink)" stroke-width="\#(strokeWidth)" stroke-linecap="round" stroke-linejoin="round">"#
         for stroke in strokes {
             guard let first = stroke.points.first else { continue }
             func coordinate(_ point: InkPoint) -> String {
@@ -55,7 +60,8 @@ extension InkDrawing {
 
 private func isRGB(_ value: String) -> Bool {
     let bytes = value.utf8
-    return bytes.count == 7 && bytes.first == 35 && bytes.dropFirst().allSatisfy {
-        (48 ... 57).contains($0) || (65 ... 70).contains($0) || (97 ... 102).contains($0)
-    }
+    return bytes.count == 7 && bytes.first == 35
+        && bytes.dropFirst().allSatisfy {
+            (48 ... 57).contains($0) || (65 ... 70).contains($0) || (97 ... 102).contains($0)
+        }
 }

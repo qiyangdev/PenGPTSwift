@@ -84,6 +84,19 @@ Use the same model files as the iOS example. In Xcode, select the **HandwritingE
 
 Use the inspector to switch between Write and Draw, enter text, and control playback. In Write mode, the Writer menu shows the selected style and lets you choose a different one. In Draw mode, the inspector shows the source, guidance, and ink settings. Use the window toolbar to share the result or toggle the inspector.
 
+## Lint and format
+
+Install SwiftLint with `brew install swiftlint`. Formatting uses `swift-format` from the active Xcode toolchain. The formatting baseline and CI use Xcode 27.
+
+```sh
+make lint          # SwiftLint checks
+make format        # Rewrite Swift files using .swift-format
+make format-check  # Check formatting without rewriting files
+make check         # Run both checks, as CI does
+```
+
+These commands cover the Package manifest, sources, tests, and the handwriting example.
+
 ## Tests
 
 Run `swift test -c release` on macOS. To run the comparisons against released models, put the converted files in `Tests/PenGPTTests/Fixtures/` as `released-hand.pengpt`, `released-sketch.pengpt`, and `released-words.pengpt`. CI also runs these comparisons.
